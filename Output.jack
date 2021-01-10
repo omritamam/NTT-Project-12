@@ -17,10 +17,15 @@
 class Output {
 
     // Character map for displaying characters
-    static Array charMaps; 
+    static Array charMaps;
+    static int x, y;
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        let x = 0;
+        let y = 0;
+        do Output.initMap();
+        return;
     }
 
     // Initializes the character map array
@@ -71,7 +76,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); // A ** TO BE FILLED **
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -143,26 +148,26 @@ class Output {
     // Creates the character map array of the given character index, using the given values.
     function void create(int index, int a, int b, int c, int d, int e,
                          int f, int g, int h, int i, int j, int k) {
-	var Array map;
+        var Array map;
 
-	let map = Array.new(11);
+        let map = Array.new(11);
         let charMaps[index] = map;
 
-        let map[0] = a;
-        let map[1] = b;
-        let map[2] = c;
-        let map[3] = d;
-        let map[4] = e;
-        let map[5] = f;
-        let map[6] = g;
-        let map[7] = h;
-        let map[8] = i;
-        let map[9] = j;
-        let map[10] = k;
+        let map[0] = a + (256 * a);
+        let map[1] = b + (256 * b);
+        let map[2] = c + (256 * c);
+        let map[3] = d + (256 * d);
+        let map[4] = e + (256 * e);
+        let map[5] = f + (256 * f);
+        let map[6] = g + (256 * g);
+        let map[7] = h + (256 * h);
+        let map[8] = i + (256 * i);
+        let map[9] = j + (256 * j);
+        let map[10] = k + (256 * k);
 
         return;
     }
-    
+
     // Returns the character map (array of size 11) of the given character.
     // If the given character is invalid or non-printable, returns the
     // character map of a black square.
@@ -173,31 +178,141 @@ class Output {
         return charMaps[c];
     }
 
+    function void setCharacter(char c) {
+        var Array character_map;
+        var int screen_offset;
+        var int i;
+        var int byte_to_screen;
+        var int original_content;
+
+        let character_map = Output.getMap(c);
+        let screen_offset = (16384 + (352 * y)) + ((8 * x) / 16);
+
+        if ((x & 1) = 0) {
+            // x is even
+            let i = 0;
+            while (i < 11) {
+                let byte_to_screen = character_map[i] & 255;
+                let original_content = Memory.peek(screen_offset);
+                let original_content = (original_content & -256) | byte_to_screen;
+                do Memory.poke(screen_offset, original_content);
+                let screen_offset = screen_offset + 32;    
+                let i = i + 1;
+            }
+        }
+        else {
+            // x is odd
+            let i = 0;
+            while (i < 11) {
+                let byte_to_screen = character_map[i] & -256;
+                let original_content = Memory.peek(screen_offset);
+                let original_content = (original_content & 255) | byte_to_screen;
+                do Memory.poke(screen_offset, original_content);
+                let screen_offset = screen_offset + 32;    
+                let i = i + 1;
+            }
+        }
+
+        return;
+    }
+
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        if (((i > 22) | (j > 63)) | ((i < 0) | (j < 0))) {
+            // Cannot compute the squre root of a negative number error
+            do Sys.error(20);
+            // Unreachable code
+        }
+
+        let y = i;
+        let x = j;
+
+        do Output.setCharacter(32);  // Print a ' ' char to erase what was there
+        return;
+    }
+
+    function void advance() {
+        let x = x + 1;
+        if (x = 64) {
+            let x = 0;
+            let y = y + 1;
+
+            if (y = 23) {
+                let y = 0;
+                do Screen.clearScreen();
+            }
+        }
+
+        do Output.moveCursor(y, x);
+        return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        if (c = 128) {              // New line
+            do Output.println();
+        }
+        else {
+            if (c = 129) {          // Backspace
+                do Output.backSpace();
+            }
+            else {
+                do Output.setCharacter(c);
+                do Output.advance();
+            }
+        }
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int i;
+        let i = 0;
+        while (~(i = s.length())) {
+            do Output.printChar(s.charAt(i));
+            let i = i + 1;
+        }
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String repr;
+        let repr = String.new(6);
+        do repr.setInt(i);
+
+        do Output.printString(repr);
+
+        do repr.dispose();
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        let x = 63;
+        do Output.advance();
+
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        if (x = 0) {
+            if (y = 0) {
+                do Output.moveCursor(y, x - 1);
+            }
+            else {
+                do Output.moveCursor(y - 1, 63);
+            }
+        }
+        else {
+            do Output.moveCursor(y, x - 1);
+        }
+
+        return;
     }
 }
