@@ -21,8 +21,9 @@ class Memory {
         let freeList = heapBase + 2;
 
         // Initialize free chunk
-        freeList[-1] = heapEnd - freeList;              // Chunk size
-        freeList[-2] = null;                            // Next chunk
+        let freeList[-1] = heapEnd - freeList;              // Chunk size
+        let freeList[-2] = null;                            // Next chunk
+        return;
     }
 
     /** Returns the RAM value at the given address. */
@@ -50,7 +51,7 @@ class Memory {
 
         let last_pointer = null;
         let current_pointer = freeList;
-        while (current_pointer[-1] < size) {
+        while (current_pointer[-1] < size + 1) {
             let last_pointer = current_pointer;
             let current_pointer = current_pointer[-2];
             if (current_pointer = null) {
@@ -67,15 +68,27 @@ class Memory {
             let current_pointer[size + 1] = current_pointer[-1] - (size + 2);
             let current_pointer[-1] = size;
             if (last_pointer = null) {
-                freeList = current_pointer + size;
-            }
-            else {
+                //only if current pointer is the first cell
+                let freeList = current_pointer + size + 2;
             }
         }
+        else {
+            if (last_pointer = null) {
+                let freeList = current_pointer + size + 2;
+                }
+            else {
+             let last_pointer[-2] = current_pointer[-2];
+             }
+        }
+        return current_pointer;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        let o[-2] = freeList;
+        let freeList = o;
+        return;    
+
     }
 }
