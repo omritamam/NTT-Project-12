@@ -15,9 +15,16 @@ class Array {
 
     /** Constructs a new Array of the given size. */
     function Array new(int size) {
+        // Usually we make this function a constructor and return this
+        // after initialization. However this way we won't be able to
+        // access Arrays with [] notation, so we allocate the memory
+        // ourselves.
+        return Memory.alloc(size);
     }
 
     /** Disposes this array. */
     method void dispose() {
+        do Memory.deAlloc(this);
+        return;
     }
 }
