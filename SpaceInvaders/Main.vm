@@ -1,0 +1,21 @@
+function Main.main 1
+call Game.new 0
+pop local 0
+push local 0
+call Game.showIntro 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+label WHILE_EXP0
+push local 0
+call Game.run 1
+not
+if-goto WHILE_END0
+goto WHILE_EXP0
+label WHILE_END0
+label IF_FALSE0
+push local 0
+call Game.dispose 1
+pop temp 0
+push constant 0
+return

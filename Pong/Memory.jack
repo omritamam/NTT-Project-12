@@ -1,0 +1,94 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+    static Array mem;
+    static Array freeList;
+    static Array heapBase, heapEnd;
+
+    /** Initializes the class. */
+    function void init() {
+        let mem = 0;
+        let heapBase = 2048;
+        let heapEnd = 16384;
+        let freeList = heapBase + 2;
+
+        // Initialize free chunk
+        let freeList[-1] = heapEnd - freeList;              // Chunk size
+        let freeList[-2] = null;                            // Next chunk
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return mem[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let mem[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var Array current_pointer;
+        var Array last_pointer;
+        
+        if (size < 1) {
+            // Allocated memory size must be positive error
+            do Sys.error(5);
+            // Unreachable code
+        }
+
+        let last_pointer = null;
+        let current_pointer = freeList;
+        while (current_pointer[-1] < size + 1) {
+            let last_pointer = current_pointer;
+            let current_pointer = current_pointer[-2];
+            if (current_pointer = null) {
+                // Heap overflow error
+                do Sys.error(6);
+                // Unreachable code
+            }
+        }
+
+        // current_pointer holds a free memory which the requested block fits in
+        if (current_pointer[-1] > (size + 2)) {
+            // Allocate chunk is big, we can split into two pieces
+            let current_pointer[size] = current_pointer[-2];
+            let current_pointer[size + 1] = current_pointer[-1] - (size + 2);
+            let current_pointer[-1] = size;
+            if (last_pointer = null) {
+                //only if current pointer is the first cell
+                let freeList = current_pointer + size + 2;
+            }
+        }
+        else {
+            if (last_pointer = null) {
+                let freeList = current_pointer + size + 2;
+                }
+            else {
+             let last_pointer[-2] = current_pointer[-2];
+             }
+        }
+        return current_pointer;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        let o[-2] = freeList;
+        let freeList = o;
+        return;    
+
+    }
+}
