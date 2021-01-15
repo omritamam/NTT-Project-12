@@ -14,7 +14,7 @@ class Screen {
     static int screenBase;
     static int screenWidth, screenHeight;
     static Array bitAt, fillByteFrom, fillByteTo;   // Efficient bit operations
-    static Array div16, mul32;                      // Efficient arithematic operations
+    static Array div16, mul32, pow2;                // Efficient arithematic operations
 
 
     /** Initializes the Screen. */
@@ -33,6 +33,7 @@ class Screen {
         let fillByteTo = Array.new(16);
         let div16 = Array.new(screenWidth + 1);
         let mul32 = Array.new(screenHeight);
+        let pow2 = Array.new(182);
 
         // Fill bitAt
         let bitAt[0] = 1;
@@ -59,9 +60,18 @@ class Screen {
             let i = i + 1;
         }
 
-        let i = 0;
+        let mul32[0] = 0;
+        let i = 1;
         while (i < screenHeight) {
-            let mul32[i] = i * 32;
+            let mul32[i] = mul32[i - 1] + 32;
+            let i = i + 1;
+        }
+
+        // Fill pow2
+        let pow2[0] = 0;
+        let i = 1;
+        while (i < 182) {
+            let pow2[i] = pow2[i - 1] + ((i + i) - 1);
             let i = i + 1;
         }
 
@@ -72,7 +82,7 @@ class Screen {
     function void clearScreen() {
         var int currentAddress, screenEnd;
         let currentAddress = screenBase;
-        let screenEnd = screenBase + ((screenWidth / 16) * (screenHeight - 1));
+        let screenEnd = screenBase + 8160;
 
         while (currentAddress < screenEnd) {
             do Memory.poke(currentAddress, 0);
@@ -205,22 +215,23 @@ class Screen {
             let currentX = x2;
             let currentY = y2;
             let endX = x1 + 1;
-            let endY = y1 + 1;
+            let endY = y1;
         }
 
         else {
             let currentX = x1;
             let currentY = y1;
             let endX = x2 + 1;
-            let endY = y2 + 1;
+            let endY = y2;
         }
 
-        let dx = endX - currentX;
+        let dx = endX - currentX + 1;
         let dy = endY - currentY;   // Can be negative
         let ydxMinusxdy = 0;
 
         if (endY > currentY) {
             // Handle an ascending line
+            let endY = endY + 1;
             while ((currentX < endX) & (currentY < endY)) {
                 do Screen.drawPixel(currentX, currentY);
 
@@ -240,6 +251,7 @@ class Screen {
 
         else {
             // Handle a descending line
+            let endY = endY - 1;
             while ((currentX < endX) & (currentY > endY)) {
                 do Screen.drawPixel(currentX, currentY);
 
@@ -274,7 +286,7 @@ class Screen {
 
 
         let y = y1;
-        while (y < y2) {
+        while (y < (y2 + 1)) {
             // Draw all pixels in line
             do Screen.drawHorizontalLine(x1, x2, y);
 
@@ -290,8 +302,15 @@ class Screen {
         var int dx, dy;
 
         let dy = -r;
+        while (dy < 0) {
+            let dx = Math.sqrt(pow2[r] - pow2[-dy]);
+            do Screen.drawHorizontalLine(x - dx, x + dx, y + dy);
+
+            let dy = dy + 1;
+        }
+
         while (dy < (r + 1)) {
-            let dx = Math.sqrt((r * r) - (dy * dy));
+            let dx = Math.sqrt(pow2[r] - pow2[dy]);
             do Screen.drawHorizontalLine(x - dx, x + dx, y + dy);
 
             let dy = dy + 1;
