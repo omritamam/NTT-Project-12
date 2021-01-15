@@ -10,9 +10,9 @@ class Sys {
 
     /** Performs all the initializations required by the OS. */
     function void init() {
+        do Memory.init();
         do Keyboard.init();
         do Math.init();
-        do Memory.init();
         do Output.init();
         do Screen.init();
         do Main.main();
@@ -31,7 +31,7 @@ class Sys {
     function void wait(int duration) {
         var int i, j;
 
-        if (duration < 1) {
+        if (duration < 0) {
             // Duration must be positive error
             do Sys.error(1);
             // Unreachable code
