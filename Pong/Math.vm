@@ -79,6 +79,16 @@ push local 0
 neg
 return
 function Math.divide 6
+push argument 1
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 3
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
 push constant 0
 pop local 4
 push argument 0
@@ -150,16 +160,26 @@ pop local 4
 goto WHILE_EXP0
 label WHILE_END0
 push local 5
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 4
 return
-label IF_FALSE0
+label IF_FALSE1
 push local 4
 neg
 return
 function Math.sqrt 3
+push argument 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 4
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
 push constant 0
 pop local 0
 push argument 0
@@ -185,16 +205,16 @@ push local 1
 call Math.multiply 2
 push argument 0
 gt
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 1
 pop local 2
-goto IF_END0
-label IF_FALSE0
+goto IF_END1
+label IF_FALSE1
 push local 1
 pop local 0
-label IF_END0
+label IF_END1
 goto WHILE_EXP0
 label WHILE_END0
 push local 0
