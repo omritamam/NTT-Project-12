@@ -64,9 +64,7 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
-        var int two2i, y2i;
-        var int next_22i, next_y2i;
-        var int sum;
+        var int portion, q;
         var boolean sign;
 
         if (y = 0) {
@@ -74,34 +72,48 @@ class Math {
             do Sys.error(3);
             // Unreachable code
         }
-
-        let sum = 0;
-
         let sign = (((x > 0) & (y > 0)) | ((x < 0) & (y < 0)));
-        let x = Math.abs(x);
-        let y = Math.abs(y);
-
-        // Now x is not large
-        while (~(x < y)) {
-            let next_y2i = y;
-            let next_22i = 1;
-
-            while (~((next_y2i > x) | (next_y2i > 16384))) {
-                let y2i = next_y2i;
-                let two2i = next_22i;
-                let next_22i = next_22i + next_22i;
-                let next_y2i = next_y2i + next_y2i;
+        if (x < 0){
+                let x = -x;
+                }
+        if (y < 0){
+                let y = -y;
+                }
+        if (x = 0){
+            return 0;
             }
 
-            let x = x - y2i;
-            let sum = sum + two2i;
+        let q = Math.dividePositives(x, y + y);
+        if ( (x - ((q + q) * y)) < y){
+            let portion = q + q;
+        }
+        else{
+            let portion = q + q + 1;
+
         }
 
         if (sign) {
-            return sum;
+            return portion;
         }
 
-        return -sum;
+        return -portion;
+    }
+
+
+     function int dividePositives(int x, int y) {
+        var int portion, q;
+        if ((x < y) | (~(y > 0))){
+            return 0;
+            }
+        let q = Math.dividePositives(x, y + y);
+        if ( (x - ((q + q) * y)) < y){
+            let portion = q + q;
+        }
+        else{
+            let portion = q + q + 1;
+            }
+        return portion;
+
     }
 
     /** Returns the integer part of the square root of x. */
