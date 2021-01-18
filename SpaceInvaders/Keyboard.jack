@@ -45,9 +45,6 @@ class Keyboard {
     function char readChar() {
         var char key;
 
-        // Show cursor
-        do Output.printChar(0);         // Will print a black rectangle
-
         // Wait for a key press
         let key = Keyboard.keyPressed();
         while (key = 0) {
@@ -58,7 +55,6 @@ class Keyboard {
         while (Keyboard.keyPressed() = key) {}
 
         // Print the char
-        do Output.backSpace();          // Delete the cursor
         do Output.printChar(key);
         return key;
     }

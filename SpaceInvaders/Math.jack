@@ -9,22 +9,9 @@
  */
 class Math {
     static int doubleQY;
-    static Array pow2;
 
     /** Initializes the library. */
     function void init() {
-        var int i;
-
-
-        // Fill pow2
-        let pow2 = Array.new(182);
-        let pow2[0] = 0;
-        let i = 1;
-        while (i < 182) {
-            let pow2[i] = pow2[i - 1] + ((i + i) - 1);
-            let i = i + 1;
-        }
-
         return;
     }
 
@@ -138,8 +125,7 @@ class Math {
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-        var int inf, delta, nextDelta;
-        var boolean break;
+        var int low, medium, high;
 
         if (x < 0) {
             // Cannot compute the squre root of a negative number error
@@ -147,32 +133,20 @@ class Math {
             // Unreachable code
         }
 
-        let inf = 0;
-        let delta = 1;
-        while (~(delta = 0)) {
-            let delta = 0;
-            let nextDelta = 1;
-            let break = false;
+        let low = 0;
+        let high = Math.min(x, 182);
 
-            while (~break) {
-                if ((inf + nextDelta) > 181) {
-                    let break = true;
-                }
-                else {
-                    if (~(pow2[inf + nextDelta] > x)) {
-                        let delta = nextDelta;
-                        let nextDelta = nextDelta + nextDelta;
-                    }
-                    else {
-                        let break = true;
-                    }
-                }
+        while (low < (high - 1)) {
+            let medium = (high + low) / 2;
+            if ((medium * medium) > x) {
+                let high = medium;
             }
-
-            let inf = inf + delta;
+            else {
+                let low = medium;
+            }
         }
 
-        return inf;
+        return low;
     }
 
     /** Returns the greater number. */
