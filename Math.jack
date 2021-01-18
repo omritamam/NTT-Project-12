@@ -8,6 +8,7 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+    static int doubleQY;
 
     /** Initializes the library. */
     function void init() {
@@ -72,24 +73,26 @@ class Math {
             do Sys.error(3);
             // Unreachable code
         }
+
         let sign = (((x > 0) & (y > 0)) | ((x < 0) & (y < 0)));
-        if (x < 0){
+        if (x < 0) {
                 let x = -x;
-                }
-        if (y < 0){
+        }
+
+        if (y < 0) {
                 let y = -y;
-                }
-        if (x = 0){
+        }
+
+        if (x = 0) {
             return 0;
-            }
+        }
 
         let q = Math.dividePositives(x, y + y);
-        if ( (x - ((q + q) * y)) < y){
+        if ((x - ((q + q) * y)) < y) {
             let portion = q + q;
         }
-        else{
+        else {
             let portion = q + q + 1;
-
         }
 
         if (sign) {
@@ -102,18 +105,22 @@ class Math {
 
      function int dividePositives(int x, int y) {
         var int portion, q;
-        if ((x < y) | (~(y > 0))){
+        if ((x < y) | (~(y > 0))) {
+            let doubleQY = 0;
             return 0;
-            }
+        }
+
         let q = Math.dividePositives(x, y + y);
-        if ( (x - ((q + q) * y)) < y){
+        if ( (x - ((q + q) * y)) < y) {
             let portion = q + q;
         }
-        else{
-            let portion = q + q + 1;
-            }
-        return portion;
 
+        else {
+            let portion = q + q + 1;
+            let doubleQY = doubleQY + y;
+        }
+
+        return portion;
     }
 
     /** Returns the integer part of the square root of x. */
